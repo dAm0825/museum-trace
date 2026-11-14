@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outputDirectory = path.join(projectRoot, "data");
-const outputFile = path.join(outputDirectory, "catalog.json");
+const outputFile = path.join(outputDirectory, "catalog-fixed.json");
 
 const museums = [
   {
