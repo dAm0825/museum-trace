@@ -2588,3 +2588,7 @@ svg {
   outline: 2px solid var(--red);
   outline-offset: 3px;
 }
+
+#nl-badge-frame {
+  display: none !important;
+}
