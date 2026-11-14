@@ -292,6 +292,7 @@ export function CuratorStudio({ initialExhibition }: CuratorStudioProps) {
                       sizes="(max-width: 900px) 100vw, 48vw"
                       style={{ objectPosition: activeArtifact.imagePosition ?? "center" }}
                       priority={activeArtifact.id === "jue"}
+                      unoptimized={activeArtifact.image.startsWith("http")}
                     />
                   ) : (
                     <div
