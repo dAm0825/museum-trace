@@ -1,329 +1,252 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CatalogExplorer } from "@/components/catalog-explorer";
-import { CuratorStudio } from "@/components/curator-studio";
-import { ArrowRight, ArrowUpRight, Globe, Quote, Spark } from "@/components/icons";
-import { artifacts } from "@/lib/artifacts";
-import { catalogStats } from "@/lib/catalog";
-import { curateExhibition } from "@/lib/curator";
+import { BlueWhiteArchive } from "@/components/blue-white-archive";
+import { DetectiveStudio } from "@/components/detective-studio";
+import { ArrowRight, ArrowUpRight, Spark } from "@/components/icons";
+import {
+  blueWhiteStats,
+  defaultArtifact,
+} from "@/lib/blue-white";
+import { investigate } from "@/lib/investigation";
 
 export default function Home() {
-  const collectionTotal = catalogStats.total + artifacts.length;
-  const initialExhibition = curateExhibition({
-    prompt: "我对青铜器和玉器感兴趣，想理解材料和礼制的关系",
-    duration: "40",
-    audience: "成人",
-    lens: "历史脉络",
-    seed: 10037,
+  const initialReport = investigate({
+    question: "为什么这件青花瓷上的人物画像值得继续追问？",
+    artifactId: defaultArtifact.id,
   });
+  const primaryMotif =
+    defaultArtifact.motifs.find((motif) => motif !== "纹饰未标注") ?? "人物纹";
 
   return (
     <main>
-      <header className="site-header">
-        <Link className="brand" href="/" aria-label="物证首页">
-          <span className="brand-seal">物</span>
+      <header className="site-header detective-header">
+        <Link className="brand" href="/" aria-label="青花侦探首页">
+          <span className="brand-mark">
+            <i />
+            <i />
+            <i />
+          </span>
           <span className="brand-words">
-            <strong>物证</strong>
-            <small>MUSEUM TRACE</small>
+            <strong>青花侦探</strong>
+            <small>BLUE &amp; TRACE</small>
           </span>
         </Link>
-
         <nav aria-label="主导航">
-          <a href="#studio">AI 策展</a>
-          <a href="#method">我们如何做</a>
-          <a href="#collection">开放馆藏</a>
+          <a href="#investigator">探案台</a>
+          <a href="#method">推理机制</a>
+          <a href="#archive">馆藏档案</a>
         </nav>
-
-        <a className="header-action" href="#studio">
-          开始策展
+        <a className="header-action" href="#investigator">
+          开始探查
           <ArrowRight />
         </a>
       </header>
 
-      <section className="hero" aria-labelledby="hero-title">
-        <div className="hero-orbit hero-orbit-one" />
-        <div className="hero-orbit hero-orbit-two" />
+      <section className="detective-hero">
+        <div className="hero-grid-lines" />
         <div className="hero-copy">
           <div className="eyebrow">
             <span className="eyebrow-dot" />
-            可溯源 · 可共创 · 可访问
+            EXPLAINABLE GRAPH-RAG
           </div>
-          <h1 id="hero-title">
-            每一件文物，
+          <h1>
+            不是“这是什么”，
             <br />
-            都有可被追问的
-            <em>来路。</em>
+            而是<em>“它为何如此？”</em>
           </h1>
-          <p className="hero-lede">
-            物证用 AI 把散落的馆藏信息重新编织成一条路线。
-            每段叙述都能回到它的证据，每个观众都能改写自己的展览。
+          <p>
+            青花侦探把一件瓷器拆成纹饰、器型、年代与工艺关系。
+            每个判断都带出处，每处分歧都值得继续追问。
           </p>
           <div className="hero-actions">
-            <a className="primary-action" href="#studio">
+            <a className="primary-action" href="#investigator">
               <Spark />
-              生成一条文物路线
+              开始一桩文物探查
             </a>
             <a className="text-action" href="#method">
-              看看它如何思考
+              查看推理机制
               <ArrowRight />
             </a>
           </div>
-          <div className="hero-proof">
-            <span>OPEN COLLECTION</span>
-            <strong>{collectionTotal.toLocaleString("zh-CN")}</strong>
-            <p>件馆藏记录，来自 5 家博物馆</p>
+          <div className="hero-metrics">
+            <div>
+              <strong>{blueWhiteStats.total.toLocaleString("zh-CN")}</strong>
+              <span>件蓝白瓷档案</span>
+            </div>
+            <div>
+              <strong>{blueWhiteStats.explicitChinese.toLocaleString("zh-CN")}</strong>
+              <span>件明确中国青花</span>
+            </div>
+            <div>
+              <strong>{Object.keys(blueWhiteStats.motifCounts).length}</strong>
+              <span>类可检索纹饰</span>
+            </div>
           </div>
         </div>
 
-        <div className="hero-collage" aria-label="文物图片拼贴">
-          <div className="collage-main">
+        <div className="hero-case">
+          <div className="hero-case-topline">
+            <span>LIVE CASE FILE</span>
+            <span>V&amp;A / {defaultArtifact.accessionNumber}</span>
+          </div>
+          <div className="hero-case-image">
             <Image
-              src="/images/jue.jpg"
-              alt="商代青铜爵"
+              src={defaultArtifact.image}
+              alt={defaultArtifact.title}
               fill
               priority
-              sizes="(max-width: 900px) 80vw, 40vw"
+              unoptimized
+              sizes="(max-width: 900px) 100vw, 48vw"
             />
-            <div className="image-overlay" />
-            <div className="collage-caption">
-              <span>01 / OBJECT</span>
-              <strong>青铜爵</strong>
-              <small>商代 · 约公元前 16 世纪</small>
-            </div>
+            <span className="scan-cross cross-one">+</span>
+            <span className="scan-cross cross-two">+</span>
+            <span className="scan-cross cross-three">+</span>
+            <span className="hero-image-label label-motif">01 / {primaryMotif}</span>
+            <span className="hero-image-label label-period">
+              02 / {defaultArtifact.periodBucket}
+            </span>
           </div>
-          <div className="collage-secondary">
-            <Image
-              src="/images/waterfall.jpg"
-              alt="南宋高士观瀑图"
-              fill
-              sizes="220px"
-            />
-            <span>南宋 · 山水</span>
-          </div>
-          <div className="evidence-float">
-            <div className="quote-mark">
-              <Quote />
+          <div className="hero-case-footer">
+            <div>
+              <span>CASE OBJECT</span>
+              <strong>{defaultArtifact.title}</strong>
+              <small>
+                {defaultArtifact.period} · {defaultArtifact.medium}
+              </small>
             </div>
-            <span>馆藏记录</span>
+            <span className="case-actions-link">
+              <ArrowUpRight />
+            </span>
+          </div>
+          <div className="hero-evidence-card">
+            <span>EVIDENCE · SOURCE TRACE</span>
             <p>
-              “长流、尖尾与三足共同构成爵的轮廓。”
+              “馆藏摘要明确提到人物装饰，且制作年代约为 1680 年。”
             </p>
-            <div className="float-source">
-              <strong>MET OBJECT 72272</strong>
-              <span>已核对</span>
+            <div>
+              <strong>V&amp;A COLLECTIONS</strong>
+              <small>可回到原始记录</small>
             </div>
           </div>
-          <span className="vertical-note">让判断有出处，让想象有边界</span>
         </div>
 
-        <a className="scroll-cue" href="#studio" aria-label="向下浏览">
-          <span>SCROLL TO EXPLORE</span>
+        <a className="hero-scroll" href="#investigator">
+          <span>SCROLL TO INVESTIGATE</span>
           <i />
         </a>
       </section>
 
-      <div className="marquee" aria-hidden="true">
+      <div className="ticker" aria-hidden="true">
         <div>
-          <span>看见器物</span>
-          <i>◆</i>
-          <span>理解材料</span>
-          <i>◆</i>
-          <span>追问历史</span>
-          <i>◆</i>
-          <span>连接今天</span>
-          <i>◆</i>
-          <span>看见器物</span>
-          <i>◆</i>
-          <span>理解材料</span>
-          <i>◆</i>
-          <span>追问历史</span>
-          <i>◆</i>
-          <span>连接今天</span>
+          <span>图像色彩线索</span><b>◇</b>
+          <span>纹饰关系</span><b>◇</b>
+          <span>器型谱系</span><b>◇</b>
+          <span>年代分布</span><b>◇</b>
+          <span>来源交叉核验</span><b>◇</b>
+          <span>保留证据分歧</span><b>◇</b>
+          <span>图像色彩线索</span><b>◇</b>
+          <span>纹饰关系</span><b>◇</b>
+          <span>器型谱系</span><b>◇</b>
+          <span>年代分布</span><b>◇</b>
         </div>
       </div>
 
-      <CuratorStudio initialExhibition={initialExhibition} />
+      <DetectiveStudio initialReport={initialReport} stats={blueWhiteStats} />
 
       <section className="method-section" id="method">
-        <div className="section-shell">
-          <div className="section-kicker">
-            <span className="kicker-line" />
-            <span>WHY MUSEUM TRACE</span>
-            <span className="kicker-index">03</span>
-          </div>
-          <div className="method-intro">
-            <h2>
-              好故事需要想象，
-              <br />
-              <em>也需要诚实。</em>
-            </h2>
-            <p>
-              博物馆 AI 最珍贵的不是“什么都能说”，而是知道什么有依据、
-              什么是解释、什么仍然未知。
-            </p>
-          </div>
-
-          <div className="principles-grid">
-            <article className="principle-card principle-featured">
-              <div className="principle-number">01</div>
-              <Quote />
-              <h3>每一句，都能回看出处</h3>
-              <p>
-                馆藏事实、历史背景、学术解读分组呈现。点击来源即可回到原始馆藏记录，
-                不让流畅的语言掩盖证据的边界。
-              </p>
-              <div className="claim-example">
-                <span>馆藏记录</span>
-                <p>“商代青铜爵，约公元前 16 世纪。”</p>
-                <span className="claim-verified">SOURCE VERIFIED</span>
-              </div>
-            </article>
-            <article className="principle-card">
-              <div className="principle-number">02</div>
-              <Globe />
-              <h3>同一件文物，不止一种讲法</h3>
-              <p>
-                在成人、亲子和无障碍描述之间切换，改变的是语言与进入方式，
-                不改变可靠的事实骨架。
-              </p>
-              <div className="perspective-preview">
-                <span>成人</span>
-                <span>亲子</span>
-                <span>无障碍</span>
-              </div>
-            </article>
-            <article className="principle-card">
-              <div className="principle-number">03</div>
-              <Spark />
-              <h3>AI 是策展搭档，不是答案机器</h3>
-              <p>
-                检索、编排、改写与审校分步运行。你能看见 AI 做了什么，
-                也能替换展品、改变主题，拿回策展的决定权。
-              </p>
-              <div className="mini-agent-flow">
-                <span>检索</span>
-                <i />
-                <span>编排</span>
-                <i />
-                <span>审校</span>
-              </div>
-            </article>
-          </div>
+        <div className="section-label">
+          <span>INVESTIGATION PROTOCOL</span>
+          <i />
+          <span>04 STEPS</span>
+        </div>
+        <div className="method-heading">
+          <h2>
+            一个答案，
+            <br />
+            必须经过<em>四次质询。</em>
+          </h2>
+          <p>
+            这不是“上传一张图，返回一段百科”。系统把图像观察、馆藏对象、
+            关系图遍历和反证检查拆成可查看的执行步骤。
+          </p>
+        </div>
+        <div className="method-grid">
+          <article>
+            <span>01</span>
+            <strong>看见线索</strong>
+            <p>提取图像的蓝色色域与亮度；配置视觉模型后，再提取纹饰和器型候选。</p>
+            <i>IMAGE → FEATURE</i>
+          </article>
+          <article>
+            <span>02</span>
+            <strong>定位对象</strong>
+            <p>从 {blueWhiteStats.total.toLocaleString("zh-CN")} 条蓝白瓷馆藏中寻找证据最接近的候选。</p>
+            <i>TEXT → ARTIFACT</i>
+          </article>
+          <article>
+            <span>03</span>
+            <strong>遍历关系</strong>
+            <p>沿“文物→纹饰→年代/器型”展开多跳检索，并用当前语料的分布支持判断。</p>
+            <i>ARTIFACT → GRAPH</i>
+          </article>
+          <article>
+            <span>04</span>
+            <strong>保留分歧</strong>
+            <p>年代假设错位、纹饰证据不足或视觉候选冲突时，系统明确标注不确定性。</p>
+            <i>CLAIM → CHECK</i>
+          </article>
         </div>
       </section>
 
-      <section className="collection-section" id="collection">
-        <div className="section-shell">
-          <div className="section-kicker">
-            <span className="kicker-line" />
-            <span>OPEN COLLECTION</span>
-            <span className="kicker-index">04</span>
-          </div>
-          <div className="collection-heading">
-            <div>
-              <h2>
-                从 {collectionTotal.toLocaleString("zh-CN")} 件器物出发，
-                <br />
-                走进<em>更辽阔的时间。</em>
-              </h2>
-            </div>
-            <p>
-              聚合故宫博物院、大英博物馆、陕西历史博物馆、南京博物院与
-              The Met 开放记录。图像来源与授权状态以原始馆藏页为准。
-            </p>
-          </div>
+      <BlueWhiteArchive stats={blueWhiteStats} />
 
-          <div className="collection-grid">
-            {artifacts.map((artifact, index) => (
-              <article
-                className={`collection-card card-${index + 1}`}
-                key={artifact.id}
-              >
-                <a href={artifact.sources[0].url} target="_blank" rel="noreferrer">
-                  <div className="collection-image">
-                    <Image
-                      src={artifact.image ?? "/images/jue.jpg"}
-                      alt={artifact.title}
-                      fill
-                      sizes="(max-width: 700px) 100vw, 33vw"
-                      style={{
-                        objectPosition: artifact.imagePosition ?? "center",
-                      }}
-                    />
-                    <span>{artifact.code}</span>
-                    <div className="collection-open">
-                      <ArrowUpRight />
-                    </div>
-                  </div>
-                  <div className="collection-info">
-                    <span>
-                      {artifact.period} · {artifact.medium}
-                    </span>
-                    <h3>{artifact.title}</h3>
-                    <p>{artifact.englishTitle}</p>
-                  </div>
-                </a>
-              </article>
-            ))}
-            <article className="collection-card collection-manifesto">
-              <span>OPEN DATA / OPEN QUESTIONS</span>
-              <h3>不止展示答案，也邀请你继续追问。</h3>
-              <p>
-                下一步，物证将继续接入更多开放馆藏、考古报告和策展人工作流。
-              </p>
-              <a href="#studio">
-                用这些文物策展
-                <ArrowRight />
-              </a>
-            </article>
-          </div>
-
-          <CatalogExplorer
-            total={collectionTotal}
-            categories={catalogStats.categories}
-            museums={catalogStats.museums}
-          />
+      <section className="research-note">
+        <div>
+          <span>RESEARCH NOTE</span>
+          <h2>馆藏记录是证据，不是终点。</h2>
         </div>
-      </section>
-
-      <section className="closing-section">
-        <div className="closing-mark">物</div>
-        <p className="closing-kicker">A NEW WAY TO MEET THE PAST</p>
-        <h2>
-          文物不属于过去，
-          <br />
-          它正在<em>等待你的问题。</em>
-        </h2>
-        <a href="#studio">
-          开始你的第一次策展
+        <div className="research-note-copy">
+          <p>
+            当前语料由 V&amp;A Collections API 与 The Met Open Access
+            筛选生成。主数据只纳入材质或官方摘要能够证明“瓷质且带蓝彩”的记录；
+            纹饰关系来自馆藏名称、摘要和主题字段，并保留对应原文与来源链接。
+          </p>
+          <p>
+            自动提取仍可能漏掉画面中未被文字记录的细节。“产地待考”会明确显示为未知，
+            不通过模型补写。未配置视觉模型时，系统只做浏览器端色彩统计，不据此鉴定年代。
+          </p>
+        </div>
+        <a href="#investigator">
+          从证据出发
           <ArrowRight />
         </a>
       </section>
 
-      <footer className="site-footer">
+      <footer className="site-footer detective-footer">
         <div>
           <Link className="brand footer-brand" href="/">
-            <span className="brand-seal">物</span>
+            <span className="brand-mark">
+              <i />
+              <i />
+              <i />
+            </span>
             <span className="brand-words">
-              <strong>物证</strong>
-              <small>MUSEUM TRACE</small>
+              <strong>青花侦探</strong>
+              <small>BLUE &amp; TRACE</small>
             </span>
           </Link>
-          <p>让判断有出处，让想象有边界。</p>
+          <p>让判断有出处，让不确定也有位置。</p>
         </div>
         <div className="footer-links">
-          <a href="#studio">体验策展</a>
-          <a href="#method">技术理念</a>
-          <a
-            href="https://www.metmuseum.org/about-the-met/policies-and-documents/open-access"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Open Access
+          <a href="#investigator">探案台</a>
+          <a href="#method">推理机制</a>
+          <a href="#archive">馆藏档案</a>
+          <a href={defaultArtifact.sourceUrl} target="_blank" rel="noreferrer">
+            数据来源
           </a>
         </div>
         <div className="footer-meta">
-          <span>© 2026 MUSEUM TRACE</span>
+          <span>© 2026 BLUE &amp; TRACE</span>
           <span>AI WEB DEVELOPMENT CHALLENGE</span>
         </div>
       </footer>
