@@ -21,12 +21,12 @@ function getConfig() {
   const baseUrl = (
     process.env.LLM_BASE_URL ||
     process.env.OPENAI_BASE_URL ||
-    "https://api.openai.com/v1"
+    "https://api.deepseek.com"
   ).replace(/\/$/, "");
   const visionModel =
-    process.env.LLM_VISION_MODEL || process.env.OPENAI_MODEL || "gpt-4o-mini";
+    process.env.LLM_VISION_MODEL || process.env.OPENAI_MODEL || "deepseek-flash";
   const textModel =
-    process.env.LLM_TEXT_MODEL || process.env.OPENAI_MODEL || "gpt-4o-mini";
+    process.env.LLM_TEXT_MODEL || process.env.OPENAI_MODEL || "deepseek-flash";
   return { apiKey, baseUrl, visionModel, textModel };
 }
 
@@ -50,6 +50,7 @@ async function callChat(
     body: JSON.stringify({
       model,
       temperature: 0.15,
+      max_tokens: 2000,
       response_format: { type: "json_object" },
       messages,
     }),
