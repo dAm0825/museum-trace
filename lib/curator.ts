@@ -1,5 +1,8 @@
 import { artifacts } from "@/lib/artifacts";
+import { catalogArtifacts } from "@/lib/catalog";
 import type { Artifact, CurateInput, CuratedExhibition } from "@/lib/types";
+
+const allArtifacts = [...artifacts, ...catalogArtifacts];
 
 const themeMeta: Record<
   Artifact["theme"],
@@ -55,6 +58,34 @@ const keywordMap: Array<{ theme: Artifact["theme"]; words: string[] }> = [
   },
 ];
 
+const categoryWords: Record<string, string[]> = {
+  陶瓷: ["瓷", "陶", "釉", "窑", "ceramic", "porcelain", "stoneware"],
+  青铜器: ["青铜", "铜器", "铜镜", "爵", "鼎", "尊", "bronze"],
+  古钱币: ["钱币", "铜钱", "通宝", "银钱", "金币", "coin", "currency"],
+  字画: ["画", "绘画", "书法", "山水", "花鸟", "卷轴", "字画", "painting", "calligraphy"],
+  玉器: ["玉", "玉璧", "玉环", "jade", "nephrite"],
+  雕塑造像: ["佛像", "造像", "雕塑", "菩萨", "sculpture"],
+  织绣服饰: ["丝绸", "织物", "服饰", "纺织", "silk", "textile"],
+  兵器: ["兵器", "剑", "盾", "盔甲", "weapon", "armour"],
+};
+
+const titleVariants: Record<Artifact["theme"], string[]> = {
+  礼制: ["器以载礼", "青铜之下", "秩序的形状", "从礼器出发"],
+  材料: ["材质的温度", "泥火之间", "材料会说话", "手与物的边界"],
+  信仰: ["凝视与安放", "造像的沉默", "信念的形状", "看见神明之前"],
+  山水: ["山水之间", "笔墨的远游", "纸上的风", "观看的入口"],
+  日常: ["寻常物的来路", "古人的生活半径", "一器一日", "被使用过的历史"],
+};
+
+function mulberry32(seed: number) {
+  return function random() {
+    let value = (seed += 0x6d2b79f5);
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 function scoreArtifact(artifact: Artifact, prompt: string) {
   const normalized = prompt.toLowerCase();
   let score = 0;
@@ -66,6 +97,7 @@ function scoreArtifact(artifact: Artifact, prompt: string) {
   if (normalized.includes(artifact.theme)) score += 4;
   if (normalized.includes(artifact.period)) score += 4;
   if (normalized.includes(artifact.title)) score += 8;
+  if (artifact.museum && normalized.includes(artifact.museum)) score += 10;
 
   return score;
 }
@@ -80,21 +112,81 @@ function inferTheme(prompt: string): Artifact["theme"] {
 }
 
 export function curateExhibition(input: CurateInput): CuratedExhibition {
-  const routeLength = input.duration === "20" ? 3 : input.duration === "40" ? 5 : 7;
+  const routeLength = input.duration === "20" ? 4 : input.duration === "40" ? 6 : 8;
   const inferredTheme = inferTheme(input.prompt);
-  const ranked = artifacts
-    .map((artifact) => ({
-      artifact,
-      score:
+  const seed = input.seed ?? Date.now();
+  const random = mulberry32(seed);
+  const excluded = new Set(input.excludeIds ?? []);
+  const requestedCategories = Object.entries(categoryWords)
+    .filter(([, words]) => words.some((word) => input.prompt.includes(word)))
+    .map(([category]) => category);
+
+  const ranked = allArtifacts
+    .map((artifact, index) => {
+      let score =
         scoreArtifact(artifact, input.prompt) +
-        (artifact.theme === inferredTheme ? 6 : 0),
-    }))
+        (artifact.theme === inferredTheme ? 8 : 0);
+
+      if (artifact.category && requestedCategories.includes(artifact.category)) {
+        score += 18;
+      }
+      if (artifact.image?.startsWith("/images/")) score += 26;
+      else if (artifact.image) score += 12;
+      if (excluded.has(artifact.id)) score -= 35;
+
+      return {
+        artifact,
+        score: score + random() * (65 + (index % 7) * 4),
+      };
+    })
     .sort((a, b) => b.score - a.score);
 
-  const selected = ranked.slice(0, routeLength).map(({ artifact }) => artifact);
+  const selected: Artifact[] = [];
+  const categoryUse = new Map<string, number>();
+  const maxPerCategory =
+    requestedCategories.length === 1
+      ? Math.max(3, routeLength - 1)
+      : requestedCategories.length === 2
+        ? Math.max(3, Math.ceil(routeLength / 2))
+        : 2;
+  const candidateOrder =
+    requestedCategories.length > 0
+      ? [
+          ...ranked.filter(({ artifact }) =>
+            requestedCategories.includes(artifact.category ?? ""),
+          ),
+          ...ranked.filter(
+            ({ artifact }) =>
+              !requestedCategories.includes(artifact.category ?? ""),
+          ),
+        ]
+      : ranked;
+
+  for (const { artifact } of candidateOrder) {
+    if (selected.length >= routeLength) break;
+    const category = artifact.category ?? artifact.theme;
+    const used = categoryUse.get(category) ?? 0;
+    if (used >= maxPerCategory) continue;
+    selected.push(artifact);
+    categoryUse.set(category, used + 1);
+  }
+
+  for (const { artifact } of ranked) {
+    if (selected.length >= routeLength) break;
+    if (!selected.some((item) => item.id === artifact.id)) selected.push(artifact);
+  }
+
   const meta =
     themeMeta[inferredTheme] ??
     (selected[0] ? themeMeta[selected[0].theme] : themeMeta["材料"]);
+  const variants = titleVariants[inferredTheme] ?? titleVariants.材料;
+  const title = variants[Math.floor(random() * variants.length)] ?? variants[0];
+  const museumNames = [
+    ...new Set(selected.map((artifact) => artifact.museum).filter(Boolean)),
+  ];
+  const selectedCategories = [
+    ...new Set(selected.map((artifact) => artifact.category).filter(Boolean)),
+  ];
 
   const audienceSuffix =
     input.audience === "亲子"
@@ -104,11 +196,12 @@ export function curateExhibition(input: CurateInput): CuratedExhibition {
         : "";
 
   return {
-    title: `${meta.title} ${audienceSuffix}`.trim(),
-    subtitle: meta.subtitle,
-    thesis: `${meta.thesis} 本次路线从“${input.lens}”切入，用 ${selected.length} 件器物建立一条可回看的证据路径。`,
-    routeReason: `根据“${input.prompt}”，检索到 ${selected.length} 件馆藏记录。系统优先保留材质、年代与主题证据完整的作品，并控制在你选择的 ${input.duration} 分钟参观时间内。`,
+    title: `${title} ${audienceSuffix}`.trim(),
+    subtitle: `${meta.subtitle} · ${selectedCategories.join(" / ")}`,
+    thesis: `${meta.thesis} 本次路线从“${input.lens}”切入，从 ${allArtifacts.length} 件藏品中抽取 ${selected.length} 件，连接 ${museumNames.join("、") || "多个馆藏来源"}。`,
+    routeReason: `根据“${input.prompt}”，系统从 5 家博物馆的 ${allArtifacts.length} 条馆藏记录中检索候选，并加入随机策展种子；上一轮展品会被降权，因此再次生成会得到新的组合。路线控制在 ${input.duration} 分钟内。`,
     artifactIds: selected.map((artifact) => artifact.id),
+    artifacts: selected,
     agentSteps: [
       {
         id: "intent",
@@ -119,13 +212,13 @@ export function curateExhibition(input: CurateInput): CuratedExhibition {
       {
         id: "retrieve",
         name: "证据检索",
-        detail: `在 ${artifacts.length} 件藏品和 ${artifacts.reduce((count, item) => count + item.evidence.length, 0)} 条证据片段中进行相关性排序。`,
+        detail: `在 ${allArtifacts.length} 件藏品和 ${allArtifacts.reduce((count, item) => count + item.evidence.length, 0)} 条证据片段中进行相关性排序。`,
         state: "done",
       },
       {
         id: "curate",
         name: "路线编排",
-        detail: "按时代、主题与观看节奏组合展品，形成起承转合的微型展览。",
+        detail: `加入 seed ${String(seed).slice(-6)}，在上轮结果之外重新选取展品并保持类别多样性。`,
         state: "done",
       },
       {
