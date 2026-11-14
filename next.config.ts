@@ -17,6 +17,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.metmuseum.org",
       },
+      {
+        protocol: "https",
+        hostname: "framemark.vam.ac.uk",
+      },
     ],
   },
 };
