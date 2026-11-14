@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "物证 Museum Trace｜可溯源 AI 文物策展",
+  title: "青花侦探 Blue & Trace｜可解释 AI 文物探究",
   description:
-    "物证是一个以证据链为核心的 AI 文物策展与导览 Web 应用。聚合 1,000+ 件开放馆藏，输入兴趣、时间和同行者，生成一条可追溯、可重写、可访问的微型展览。",
-  keywords: ["博物馆", "文物", "AI策展", "RAG", "文化遗产", "数字博物馆"],
+    "从图片、纹饰、器型与年代追问一件青花瓷。聚合 1,000+ 件开放馆藏，以可解释关系图、来源引用和证据冲突生成文物探案报告。",
+  keywords: ["青花瓷", "文物侦探", "博物馆", "Graph-RAG", "AI Agent", "文化遗产"],
   openGraph: {
-    title: "物证 Museum Trace",
-    description: "不是让 AI 讲文物，而是让 AI 把“为什么这样讲”的证据摊开。",
+    title: "青花侦探 Blue & Trace",
+    description: "不只是识别青花瓷，而是把纹饰、器型、年代与来源关系摊开。",
     type: "website",
   },
 };
