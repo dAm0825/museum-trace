@@ -80,7 +80,7 @@
 - 提取平均色彩、蓝色像素比例和亮度
 - 明确标注“只描述颜色，不据此鉴定年代或真伪”
 
-配置兼容 OpenAI Chat Completions 的视觉模型后：
+配置 DeepSeek `deepseek-flash` 或其他兼容 OpenAI Chat Completions 的视觉模型后：
 
 - 视觉模型返回纹饰、器型、颜色与置信度候选
 - 候选必须来自当前知识语料允许的标签集合
@@ -114,9 +114,9 @@ cp .env.example .env.local
 
 ```env
 LLM_API_KEY=
-LLM_BASE_URL=https://api.openai.com/v1
-LLM_VISION_MODEL=gpt-4o-mini
-LLM_TEXT_MODEL=gpt-4o-mini
+LLM_BASE_URL=https://api.deepseek.com
+LLM_VISION_MODEL=deepseek-flash
+LLM_TEXT_MODEL=deepseek-flash
 ```
 
 模型只接收当前问题和已检索证据；系统提示要求不得补写输入中没有的史实。
