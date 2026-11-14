@@ -17,10 +17,13 @@ export type Artifact = {
   id: string;
   title: string;
   englishTitle: string;
+  museum?: string;
+  category?: string;
   period: string;
   date: string;
   medium: string;
-  image: string;
+  image?: string;
+  imagePage?: string;
   imagePosition?: string;
   code: string;
   summary: string;
@@ -42,6 +45,8 @@ export type CurateInput = {
   duration: "20" | "40" | "60";
   audience: "成人" | "亲子" | "专业观众";
   lens: "历史脉络" | "工艺美学" | "文明互鉴";
+  seed?: number;
+  excludeIds?: string[];
 };
 
 export type AgentStep = {
@@ -57,6 +62,7 @@ export type CuratedExhibition = {
   thesis: string;
   routeReason: string;
   artifactIds: string[];
+  artifacts: Artifact[];
   agentSteps: AgentStep[];
   generatedAt: string;
   mode: "local-rag";
