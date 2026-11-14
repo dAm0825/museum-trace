@@ -123,9 +123,9 @@ export function BlueWhiteArchive({ stats }: ArchiveProps) {
     <section className="archive-section" id="archive">
       <div className="archive-header">
         <div className="section-label">
-          <span>OPEN EVIDENCE ARCHIVE</span>
+          <span>开放证据档案</span>
           <i />
-          <span>V&A + THE MET</span>
+          <span>维艾博物馆 + 大都会博物馆</span>
         </div>
         <div>
           <h2>
@@ -142,7 +142,7 @@ export function BlueWhiteArchive({ stats }: ArchiveProps) {
 
       <div className="archive-controls">
         <label className="archive-search">
-          <span>SEARCH / {resultTotal.toLocaleString("zh-CN")}</span>
+          <span>检索 / {resultTotal.toLocaleString("zh-CN")}</span>
           <input
             type="search"
             value={query}
