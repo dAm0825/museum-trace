@@ -2,6 +2,8 @@
 
 一个面向探究式学习的可解释 AI 青花瓷研究工具。
 
+**在线演示：** [blue-trace-detective.netlify.app](https://blue-trace-detective.netlify.app)
+
 用户不只问“这是什么”，而是继续追问：
 
 - 为什么这件青花瓷会出现这种纹饰？
