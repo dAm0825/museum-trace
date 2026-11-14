@@ -28,14 +28,18 @@ export type BlueWhiteArtifact = {
   museumShortName: string;
   accessionNumber: string;
   title: string;
+  sourceTitle: string;
   objectName: string;
+  sourceObjectName: string;
   maker: string;
   productionPlace: string;
   tradition: string;
   period: string;
+  sourcePeriod: string;
   periodBucket: string;
   dateText: string;
   medium: string;
+  sourceMedium: string;
   summary: string;
   image: string;
   sourceUrl: string;
