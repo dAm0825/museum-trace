@@ -28,7 +28,7 @@ export default function Home() {
           </span>
           <span className="brand-words">
             <strong>青花侦探</strong>
-            <small>BLUE &amp; TRACE</small>
+            <small>青花瓷证据探究工具</small>
           </span>
         </Link>
         <nav aria-label="主导航">
@@ -47,7 +47,7 @@ export default function Home() {
         <div className="hero-copy">
           <div className="eyebrow">
             <span className="eyebrow-dot" />
-            EXPLAINABLE GRAPH-RAG
+            可解释知识图谱检索
           </div>
           <h1>
             <span className="hero-line">不是“这是什么”，</span>
@@ -87,8 +87,10 @@ export default function Home() {
 
         <div className="hero-case">
           <div className="hero-case-topline">
-            <span>LIVE CASE FILE</span>
-            <span>V&amp;A / {defaultArtifact.accessionNumber}</span>
+            <span>实时馆藏案卷</span>
+            <span>
+              {defaultArtifact.museumShortName} / {defaultArtifact.accessionNumber}
+            </span>
           </div>
           <div className="hero-case-image">
             <Image
@@ -109,7 +111,7 @@ export default function Home() {
           </div>
           <div className="hero-case-footer">
             <div>
-              <span>CASE OBJECT</span>
+              <span>探案对象</span>
               <strong>{defaultArtifact.title}</strong>
               <small>
                 {defaultArtifact.period} · {defaultArtifact.medium}
@@ -120,19 +122,19 @@ export default function Home() {
             </span>
           </div>
           <div className="hero-evidence-card">
-            <span>EVIDENCE · SOURCE TRACE</span>
+            <span>证据 · 来源线索</span>
             <p>
               “馆藏摘要明确提到人物装饰，且制作年代约为 1680 年。”
             </p>
             <div>
-              <strong>V&amp;A COLLECTIONS</strong>
+              <strong>馆藏原始记录</strong>
               <small>可回到原始记录</small>
             </div>
           </div>
         </div>
 
         <a className="hero-scroll" href="#investigator">
-          <span>SCROLL TO INVESTIGATE</span>
+          <span>向下开始探查</span>
           <i />
         </a>
       </section>
@@ -156,9 +158,9 @@ export default function Home() {
 
       <section className="method-section" id="method">
         <div className="section-label">
-          <span>INVESTIGATION PROTOCOL</span>
+          <span>四步探究流程</span>
           <i />
-          <span>04 STEPS</span>
+          <span>四个步骤</span>
         </div>
         <div className="method-heading">
           <h2>
@@ -176,25 +178,25 @@ export default function Home() {
             <span>01</span>
             <strong>看见线索</strong>
             <p>提取图像的蓝色色域与亮度；配置视觉模型后，再提取纹饰和器型候选。</p>
-            <i>IMAGE → FEATURE</i>
+            <i>图像 → 特征</i>
           </article>
           <article>
             <span>02</span>
             <strong>定位对象</strong>
             <p>从 {blueWhiteStats.total.toLocaleString("zh-CN")} 条蓝白瓷馆藏中寻找证据最接近的候选。</p>
-            <i>TEXT → ARTIFACT</i>
+            <i>文字 → 器物</i>
           </article>
           <article>
             <span>03</span>
             <strong>遍历关系</strong>
             <p>沿“文物→纹饰→年代/器型”展开多跳检索，并用当前语料的分布支持判断。</p>
-            <i>ARTIFACT → GRAPH</i>
+            <i>器物 → 图谱</i>
           </article>
           <article>
             <span>04</span>
             <strong>保留分歧</strong>
             <p>年代假设错位、纹饰证据不足或视觉候选冲突时，系统明确标注不确定性。</p>
-            <i>CLAIM → CHECK</i>
+            <i>判断 → 核验</i>
           </article>
         </div>
       </section>
@@ -203,12 +205,12 @@ export default function Home() {
 
       <section className="research-note">
         <div>
-          <span>RESEARCH NOTE</span>
+          <span>研究说明</span>
           <h2>馆藏记录是证据，不是终点。</h2>
         </div>
         <div className="research-note-copy">
           <p>
-            当前语料由 V&amp;A Collections API 与 The Met Open Access
+            当前语料由维多利亚与艾尔伯特博物馆馆藏数据与大都会艺术博物馆开放馆藏
             筛选生成。主数据只纳入材质或官方摘要能够证明“瓷质且带蓝彩”的记录；
             纹饰关系来自馆藏名称、摘要和主题字段，并保留对应原文与来源链接。
           </p>
@@ -233,7 +235,7 @@ export default function Home() {
             </span>
             <span className="brand-words">
               <strong>青花侦探</strong>
-              <small>BLUE &amp; TRACE</small>
+              <small>青花瓷证据探究工具</small>
             </span>
           </Link>
           <p>让判断有出处，让不确定也有位置。</p>
@@ -247,8 +249,8 @@ export default function Home() {
           </a>
         </div>
         <div className="footer-meta">
-          <span>© 2026 BLUE &amp; TRACE</span>
-          <span>AI WEB DEVELOPMENT CHALLENGE</span>
+          <span>© 2026 青花侦探</span>
+          <span>AI 网站开发挑战赛参赛作品</span>
         </div>
       </footer>
     </main>
