@@ -22,6 +22,13 @@ export async function POST(request: Request) {
         input.lens === "工艺美学" || input.lens === "文明互鉴"
           ? input.lens
           : "历史脉络",
+      seed:
+        typeof input.seed === "number" && Number.isFinite(input.seed)
+          ? Math.trunc(input.seed)
+          : Date.now(),
+      excludeIds: Array.isArray(input.excludeIds)
+        ? input.excludeIds.filter((id): id is string => typeof id === "string").slice(0, 20)
+        : [],
     };
 
     return NextResponse.json(curateExhibition(normalized));
