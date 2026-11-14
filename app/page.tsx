@@ -1,10 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
+import { CatalogExplorer } from "@/components/catalog-explorer";
 import { CuratorStudio } from "@/components/curator-studio";
 import { ArrowRight, ArrowUpRight, Globe, Quote, Spark } from "@/components/icons";
 import { artifacts } from "@/lib/artifacts";
+import { catalogStats } from "@/lib/catalog";
+import { curateExhibition } from "@/lib/curator";
 
 export default function Home() {
+  const collectionTotal = catalogStats.total + artifacts.length;
+  const initialExhibition = curateExhibition({
+    prompt: "我对青铜器和玉器感兴趣，想理解材料和礼制的关系",
+    duration: "40",
+    audience: "成人",
+    lens: "历史脉络",
+    seed: 10037,
+  });
+
   return (
     <main>
       <header className="site-header">
@@ -58,8 +70,8 @@ export default function Home() {
           </div>
           <div className="hero-proof">
             <span>OPEN COLLECTION</span>
-            <strong>07</strong>
-            <p>件开放馆藏，21 条可核对证据</p>
+            <strong>{collectionTotal.toLocaleString("zh-CN")}</strong>
+            <p>件馆藏记录，来自 5 家博物馆</p>
           </div>
         </div>
 
@@ -130,7 +142,7 @@ export default function Home() {
         </div>
       </div>
 
-      <CuratorStudio artifacts={artifacts} />
+      <CuratorStudio initialExhibition={initialExhibition} />
 
       <section className="method-section" id="method">
         <div className="section-shell">
@@ -210,14 +222,14 @@ export default function Home() {
           <div className="collection-heading">
             <div>
               <h2>
-                从七件器物出发，
+                从 {collectionTotal.toLocaleString("zh-CN")} 件器物出发，
                 <br />
                 走进<em>更辽阔的时间。</em>
               </h2>
             </div>
             <p>
-              当前演示馆藏来自 The Metropolitan Museum of Art 开放收藏，
-              所有图片为 Public Domain，并保留原始馆藏链接。
+              聚合故宫博物院、大英博物馆、陕西历史博物馆、南京博物院与
+              The Met 开放记录。图像来源与授权状态以原始馆藏页为准。
             </p>
           </div>
 
@@ -230,7 +242,7 @@ export default function Home() {
                 <a href={artifact.sources[0].url} target="_blank" rel="noreferrer">
                   <div className="collection-image">
                     <Image
-                      src={artifact.image}
+                      src={artifact.image ?? "/images/jue.jpg"}
                       alt={artifact.title}
                       fill
                       sizes="(max-width: 700px) 100vw, 33vw"
@@ -265,6 +277,12 @@ export default function Home() {
               </a>
             </article>
           </div>
+
+          <CatalogExplorer
+            total={collectionTotal}
+            categories={catalogStats.categories}
+            museums={catalogStats.museums}
+          />
         </div>
       </section>
 
