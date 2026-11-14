@@ -1,70 +1,92 @@
-# 物证 Museum Trace
+# 青花侦探 Blue & Trace
 
-一个以「证据链」为核心的 AI 文物策展与导览 Web 应用原型。用户输入兴趣、参观时间、同行者与观看视角后，系统会从开放馆藏资料中组合一条微型展览路线，并为关键叙述保留可回到原始馆藏页面的证据。
+一个面向探究式学习的可解释 AI 青花瓷研究工具。
 
-> 不是让 AI 讲文物，而是让 AI 把「为什么这样讲」的证据摊开。
+用户不只问“这是什么”，而是继续追问：
 
-![项目状态](https://img.shields.io/badge/status-interactive%20prototype-bd4c32)
-![技术栈](https://img.shields.io/badge/Next.js-TypeScript-17211c)
+- 为什么这件青花瓷会出现这种纹饰？
+- 这类纹饰与哪些年代、器型同时出现？
+- 图像观察与馆藏记录是否一致？
+- 哪一步是有来源的事实，哪一步只是解释？
 
-## 核心体验
+项目把 **视觉观察、馆藏检索、关系图遍历、跨记录比较、冲突检测和问题链生成** 串成一条可查看的研究流程。
 
-- **千件级馆藏**：内置 1,000+ 条馆藏记录，支持按博物馆、类别和关键词检索。
-- **个性化策展**：根据兴趣、时长、受众与观看视角生成 4、6 或 8 件文物的路线。
-- **非固定结果**：每次生成加入新的策展种子，并降低上一轮展品权重，因此同一问题会得到不同组合。
-- **可追溯讲解**：将「馆藏记录」「历史背景」「学术解读」分开呈现。
-- **多视角改写**：为同一件文物提供成人、亲子与无障碍描述。
-- **证据审校**：每件文物包含 3 条证据片段和原始馆藏来源链接。
-- **语音导览**：使用 Web Speech API 朗读当前讲解。
-- **响应式设计**：桌面、平板和移动端均可使用。
-- **本地可演示**：无需配置大模型密钥即可完整运行。
+## 数据规模
 
-## 页面结构
+当前内置 **1,172 条蓝白瓷分析记录**：
 
-1. 品牌首页与开放馆藏视觉
-2. AI 策展工作台
-3. 动态路线与文物讲解
-4. 证据链展开面板
-5. 产品理念与 AI 工作流说明
-6. 开放馆藏浏览
+| 来源 | 记录数 | 说明 |
+| --- | ---: | --- |
+| Victoria and Albert Museum | 1,100 | 从 Collections API 获取；只保留 porcelain 且材质/摘要可证明带蓝彩或釉下蓝彩的记录 |
+| The Metropolitan Museum of Art | 72 | 从 Open Access CSV 中筛选的明确中国釉下青花记录 |
 
-## 技术架构
+每条记录包含：
+
+- 标题、器名、馆藏编号
+- 年代、原始年代文本、标准化年代桶
+- 材质与技法
+- 纹饰线索、器型线索
+- 文化传统标签
+- 自动生成的观察、工艺、年代与不确定性说明
+- 带原文证据片段和馆藏来源链接的关系数组
+
+“中国青花”与“其他蓝白瓷/产地待考”会明确区分，不把比较对象或仿制品冒充为中国青花。
+
+## 核心流程
 
 ```text
-app/
-├── api/curate/route.ts    # 策展 API
-├── globals.css            # 视觉系统与响应式样式
-├── layout.tsx             # SEO 与页面布局
-└── page.tsx               # 首页
-components/
-├── curator-studio.tsx     # 核心交互工作台
-└── icons.tsx              # 原生 SVG 图标
-lib/
-├── artifacts.ts           # 馆藏、证据与来源数据
-├── catalog.ts             # 千件级馆藏映射与讲解生成
-├── curator.ts             # 主题推断、检索与路线编排
-└── types.ts               # 领域类型
-data/catalog-fixed.json     # 可重复生成的 1,000+ 馆藏目录
-public/images/              # 开放授权藏品图片
+用户问题 / 图片
+      │
+      ▼
+图像色彩观察（可选视觉模型候选）
+      │
+      ▼
+从 1,172 条馆藏中定位分析对象
+      │
+      ▼
+文物 ── 纹饰 ── 年代
+  │       │
+  └──── 器型 ── 年代
+      │
+      ▼
+跨记录比较 + 冲突保留
+      │
+      ▼
+证据报告 + 下一步问题链
 ```
 
-当前版本采用轻量级本地检索编排：
+### 可解释 Graph-RAG
 
-1. 解析用户兴趣中的主题、材质、时代与观看偏好。
-2. 在 1,000+ 馆藏记录中进行关键词和类别检索。
-3. 注入随机策展种子，并对上一轮展品降权。
-4. 根据参观时长选择 4、6 或 8 件文物，同时限制同一类别占比。
-5. 生成路线、策展观点、Agent 执行记录和证据列表。
-6. 将事实记录与解释性内容分组展示。
+- 每条文物关系都保存 `predicate / object / evidence / sourceUrl / kind`
+- 纹饰和年代关系会回溯到标题、摘要、材质或时代字段中的原文
+- 跨记录统计明确标注为“当前馆藏语料分布”，不冒充完整艺术史统计
+- 前端的证据面板可直接打开 V&A 或 The Met 原始馆藏页面
 
-这一实现可以在没有外部 API 的情况下稳定演示。后续可将 `lib/curator.ts` 中的检索结果作为上下文，接入 LLM、向量数据库与真实 Agent 工具调用，同时保留当前证据审校与降级路径。
+### Agent 执行记录
+
+系统返回真实工具执行轨迹：
+
+1. 解析问题中的对象、纹饰、器型与年代假设
+2. 定位馆藏对象
+3. 遍历纹饰、器型与年代关系
+4. 对同类记录做跨来源比较
+5. 生成可以继续追问的问题链
+
+### 多模态输入
+
+未配置模型密钥时：
+
+- 浏览器端读取上传图片
+- 提取平均色彩、蓝色像素比例和亮度
+- 明确标注“只描述颜色，不据此鉴定年代或真伪”
+
+配置兼容 OpenAI Chat Completions 的视觉模型后：
+
+- 视觉模型返回纹饰、器型、颜色与置信度候选
+- 候选必须来自当前知识语料允许的标签集合
+- 视觉候选与馆藏标签冲突时保留分歧，不强制统一
 
 ## 本地运行
-
-环境要求：
-
-- Node.js 20+
-- pnpm 9+
 
 ```bash
 pnpm install
@@ -73,76 +95,86 @@ pnpm dev
 
 打开 [http://localhost:3000](http://localhost:3000)。
 
-生产构建：
-
-```bash
-pnpm build
-pnpm start
-```
-
-类型检查：
+类型检查和生产构建：
 
 ```bash
 pnpm typecheck
+pnpm build
 ```
 
-## 环境变量
+## 可选模型配置
 
-当前公开演示不依赖任何密钥。可复制 `.env.example` 并保留占位，方便后续接入大模型服务。
+公开证据图谱演示不需要密钥。若需启用视觉识别和证据约束的叙事综合：
 
 ```bash
 cp .env.example .env.local
 ```
 
-切勿将真实 API 密钥提交到仓库。
+配置：
 
-## 数据与图像来源
-
-千件级目录由 `scripts/fetch-catalog.mjs` 从以下开放数据源聚合：
-
-- Wikidata 馆藏关联记录与共享图片链接
-- The Metropolitan Museum of Art Open Access
-
-当前数据分布为：
-
-| 博物馆 | 记录数 |
-| --- | ---: |
-| 故宫博物院 | 650 |
-| 大英博物馆 | 309 |
-| 陕西历史博物馆 | 120 |
-| 南京博物院 | 1 |
-| 大都会艺术博物馆 | 11 |
-
-另保留 7 件具有完整策展叙事和来源说明的重点文物，因此应用首页展示总量为 1,098。数据可由以下命令重新生成：
-
-```bash
-pnpm data:refresh
+```env
+LLM_API_KEY=
+LLM_BASE_URL=https://api.openai.com/v1
+LLM_VISION_MODEL=gpt-4o-mini
+LLM_TEXT_MODEL=gpt-4o-mini
 ```
 
-重点演示馆藏：
+模型只接收当前问题和已检索证据；系统提示要求不得补写输入中没有的史实。
 
-- [Open Access 说明](https://www.metmuseum.org/about-the-met/policies-and-documents/open-access)
-- [青铜爵 72272](https://www.metmuseum.org/art/collection/search/72272)
-- [玉龙环 39637](https://www.metmuseum.org/art/collection/search/39637)
-- [玉璧 42840](https://www.metmuseum.org/art/collection/search/42840)
-- [南宋山水 40196](https://www.metmuseum.org/art/collection/search/40196)
-- [钧窑花盆 460663](https://www.metmuseum.org/art/collection/search/460663)
-- [观音造像 42718](https://www.metmuseum.org/art/collection/search/42718)
-- [北魏佛像 42733](https://www.metmuseum.org/art/collection/search/42733)
+## 数据更新
 
-聚合目录中的图像可能来自 Wikimedia Commons，不能统一视为公共领域；授权状态与署名要求以每条记录链接到的原始页面为准。界面中的解释性文字为项目演示叙事，使用或扩展藏品时应继续核对来源、年代、材质与授权信息，不以生成内容替代专业鉴定。
+V&A：
 
-## 竞赛能力映射
+```bash
+pnpm data:blue-white:vam
+```
 
-| 赛项要求 | 当前实现 |
-| --- | --- |
-| 大模型集成质量 | 预留模型接入层；当前使用稳定的本地降级模式 |
-| Agent / 工作流 | 意图解析、证据检索、路线编排、事实审校四阶段 |
-| RAG | 馆藏数据检索与相关性排序，保留来源索引 |
-| 多模态 | 以文物图像为入口，支持图像浏览与语音导览 |
-| AI 安全与可控性 | 事实、背景、解释分层，未知与推测明确标出 |
-| 前端工程质量 | TypeScript、领域类型、API 分层、响应式与无障碍 |
-| 用户体验 | 动态 Agent 反馈、流式式流程、多视角切换 |
+The Met：
+
+1. 从 [The Met Open Access](https://github.com/metmuseum/openaccess) 下载 `MetObjects.csv`
+2. 保存为 `work/MetObjects.csv`
+3. 运行：
+
+```bash
+pnpm data:blue-white:met
+```
+
+数据生成脚本会保留可重试检查点，避免单条馆藏接口失败导致整体重建。
+
+## 目录结构
+
+```text
+app/
+├── api/
+│   ├── blue-white/route.ts    # 馆藏检索
+│   └── investigate/route.ts   # 探究 Agent API
+├── globals.css
+├── layout.tsx
+└── page.tsx
+components/
+├── blue-white-archive.tsx     # 1,172 条馆藏档案
+├── detective-studio.tsx       # 探案台与问题链画布
+└── icons.tsx
+data/
+├── met-blue-white-corpus.json
+└── vam-blue-white-corpus.json
+lib/
+├── blue-white.ts              # 数据标准化与检索
+├── detective-types.ts         # 领域类型
+├── investigation.ts           # Graph-RAG 与证据报告
+└── model.ts                   # 可选视觉/文本模型集成
+scripts/
+├── build_blue_white_corpus.py
+└── build_vam_blue_white.mjs
+```
+
+## 数据边界
+
+- 馆藏元数据不等于独立鉴定结论。
+- 标题、摘要或标签提取出的纹饰关系仍可能漏掉图中细节。
+- V&A 图片通过官方 IIIF 地址显示；使用和发布时应继续遵守其馆藏记录中的权利说明。
+- The Met 筛选记录为 Public Domain 元数据；当前 CSV 生成结果未内置图片 URL，因此使用明确的记录占位卡。
+- “产地待考”会保留为未知，不通过猜测补齐。
 
 ## 团队信息
 
@@ -153,4 +185,4 @@ pnpm data:refresh
 
 ## 原创声明
 
-本项目代码与产品概念为参赛原型开发。开放馆藏元数据和图片遵循其原始开放授权；馆藏来源已在页面、数据文件和本 README 中标注。
+项目概念、关系抽取、证据报告与前端交互为本项目原创实现。馆藏元数据和图片来自对应博物馆开放平台，来源已在每条记录和界面中链接。
