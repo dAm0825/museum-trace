@@ -11,7 +11,7 @@ import { investigate } from "@/lib/investigation";
 
 export default function Home() {
   const initialReport = investigate({
-    question: "为什么这件青花瓷上的人物画像值得继续追问？",
+    question: `为什么“${defaultArtifact.title}”值得继续追问？`,
     artifactId: defaultArtifact.id,
   });
   const primaryMotif =
@@ -56,7 +56,7 @@ export default function Home() {
             </span>
           </h1>
           <p>
-            青花侦探把一件瓷器拆成纹饰、器型、年代与工艺关系。
+            每件器物使用故宫博物院完整馆藏学名，再拆成纹饰、器型、年代与工艺关系。
             每个判断都带出处，每处分歧都值得继续追问。
           </p>
           <div className="hero-actions">
@@ -72,11 +72,11 @@ export default function Home() {
           <div className="hero-metrics">
             <div>
               <strong>{blueWhiteStats.total.toLocaleString("zh-CN")}</strong>
-              <span>件蓝白瓷档案</span>
+              <span>件完整学名馆藏</span>
             </div>
             <div>
               <strong>{blueWhiteStats.explicitChinese.toLocaleString("zh-CN")}</strong>
-              <span>件明确中国青花</span>
+              <span>件带馆藏编号</span>
             </div>
             <div>
               <strong>{Object.keys(blueWhiteStats.motifCounts).length}</strong>
@@ -124,10 +124,10 @@ export default function Home() {
           <div className="hero-evidence-card">
             <span>证据 · 来源线索</span>
             <p>
-              “馆藏摘要明确提到人物装饰，且制作年代约为 1680 年。”
+              “{defaultArtifact.title}”为故宫博物院正式馆藏名称，年代“{defaultArtifact.period}”。
             </p>
             <div>
-              <strong>馆藏原始记录</strong>
+              <strong>故宫博物院数字文物库</strong>
               <small>可回到原始记录</small>
             </div>
           </div>
@@ -169,7 +169,7 @@ export default function Home() {
             必须经过<em>四次质询。</em>
           </h2>
           <p>
-            这不是“上传一张图，返回一段百科”。系统把图像观察、馆藏对象、
+            这不是“上传一张图，返回一个泛称”。系统把完整学名、图像观察、馆藏对象、
             关系图遍历和反证检查拆成可查看的执行步骤。
           </p>
         </div>
@@ -183,7 +183,7 @@ export default function Home() {
           <article>
             <span>02</span>
             <strong>定位对象</strong>
-            <p>从 {blueWhiteStats.total.toLocaleString("zh-CN")} 条蓝白瓷馆藏中寻找证据最接近的候选。</p>
+            <p>从 {blueWhiteStats.total.toLocaleString("zh-CN")} 条带完整学名的故宫青花馆藏中寻找证据最接近的候选。</p>
             <i>文字 → 器物</i>
           </article>
           <article>
@@ -210,12 +210,12 @@ export default function Home() {
         </div>
         <div className="research-note-copy">
           <p>
-            当前语料由维多利亚与艾尔伯特博物馆馆藏数据与大都会艺术博物馆开放馆藏
-            筛选生成。主数据只纳入材质或官方摘要能够证明“瓷质且带蓝彩”的记录；
-            纹饰关系来自馆藏名称、摘要和主题字段，并保留对应原文与来源链接。
+            当前语料来自故宫博物院数字文物库的陶瓷类馆藏检索。主数据只纳入
+            正式名称明确含“青花”、具有馆藏编号和公开图片的 1,200 件文物；
+            纹饰与器型关系从完整学名中提取，并保留馆藏来源链接。
           </p>
           <p>
-            自动提取仍可能漏掉画面中未被文字记录的细节。“产地待考”会明确显示为未知，
+            自动提取仍可能漏掉学名中未写出的图像细节，因此不会据此补造名称或年代。
             不通过模型补写。未配置视觉模型时，系统只做浏览器端色彩统计，不据此鉴定年代。
           </p>
         </div>
