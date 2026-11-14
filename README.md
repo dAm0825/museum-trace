@@ -44,7 +44,7 @@ lib/
 ├── catalog.ts             # 千件级馆藏映射与讲解生成
 ├── curator.ts             # 主题推断、检索与路线编排
 └── types.ts               # 领域类型
-data/catalog.json           # 可重复生成的 1,000+ 馆藏目录
+data/catalog-fixed.json     # 可重复生成的 1,000+ 馆藏目录
 public/images/              # 开放授权藏品图片
 ```
 
