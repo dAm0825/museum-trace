@@ -11,9 +11,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "data:blue-white:vam": "node scripts/build_vam_blue_white.mjs",
-    "data:blue-white:met": "python3 scripts/build_blue_white_corpus.py",
-    "data:zh-labels": "node scripts/build-zh-catalog-labels.mjs"
+    "data:blue-white:dpm": "node scripts/build_dpm_blue_white.mjs"
   },
   "dependencies": {
     "next": "latest",
