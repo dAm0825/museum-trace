@@ -208,7 +208,7 @@ export function DetectiveStudio({
             然后让<em>证据接手。</em>
           </h2>
           <p>
-            输入一个关于青花纹饰、器型或年代的问题，或上传一张图片提取可见色彩线索。
+            输入一个关于青花馆藏学名、纹饰、器型或年代的问题，或上传一张图片提取可见色彩线索。
             系统会检索馆藏、遍历关系，并把结论与分歧一起摆出来。
           </p>
         </div>
@@ -296,7 +296,7 @@ export function DetectiveStudio({
       <div className={`case-workbench ${working ? "is-searching" : ""}`}>
         <div className="case-heading">
           <div>
-            <span className="case-index">案卷 / {artifact.sourceId}</span>
+            <span className="case-index">馆藏编号 / {artifact.accessionNumber}</span>
             <h3>{artifact.title}</h3>
             <p>
               {artifact.museumShortName} · {artifact.tradition} · {artifact.period}
@@ -322,7 +322,7 @@ export function DetectiveStudio({
                 />
               ) : (
                 <div className="no-image-artifact">
-                  <span>大都会开放馆藏</span>
+                  <span>故宫博物院馆藏</span>
                   <strong>{artifact.title.slice(0, 1)}</strong>
                   <small>该开放记录暂未提供图片</small>
                 </div>
@@ -564,7 +564,7 @@ export function DetectiveStudio({
           <div className="search-curtain" aria-live="polite">
             <div className="scan-line" />
             <Spark />
-            <span>正在检索 {stats.total.toLocaleString("zh-CN")} 条馆藏关系</span>
+            <span>正在检索 {stats.total.toLocaleString("zh-CN")} 条完整学名与馆藏关系</span>
             <small>{traceProgress} / 5</small>
           </div>
         ) : null}
