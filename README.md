@@ -25,6 +25,7 @@
 每条记录包含：
 
 - 标题、器名、馆藏编号
+- 面向中文界面的固定编目译名
 - 年代、原始年代文本、标准化年代桶
 - 材质与技法
 - 纹饰线索、器型线索
@@ -123,6 +124,12 @@ LLM_TEXT_MODEL=deepseek-flash
 
 模型只接收当前问题和已检索证据；系统提示要求不得补写输入中没有的史实。
 
+界面中的标题、器名、材质和年代使用本地固定中文词典，不在用户访问时临时翻译：
+
+```bash
+pnpm data:zh-labels
+```
+
 ## 数据更新
 
 V&A：
@@ -159,15 +166,18 @@ components/
 └── icons.tsx
 data/
 ├── met-blue-white-corpus.json
-└── vam-blue-white-corpus.json
+├── vam-blue-white-corpus.json
+└── zh-catalog-labels.json   # 标题、材质与年代中文编目词典
 lib/
 ├── blue-white.ts              # 数据标准化与检索
 ├── detective-types.ts         # 领域类型
 ├── investigation.ts           # Graph-RAG 与证据报告
-└── model.ts                   # 可选视觉/文本模型集成
+├── model.ts                   # 可选视觉/文本模型集成
+└── zh-localization.ts         # 中文编目与界面文本转换
 scripts/
 ├── build_blue_white_corpus.py
-└── build_vam_blue_white.mjs
+├── build_vam_blue_white.mjs
+└── build-zh-catalog-labels.mjs
 ```
 
 ## 数据边界
