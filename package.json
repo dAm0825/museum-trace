@@ -1,5 +1,5 @@
 {
-  "name": "museum-trace",
+  "name": "blue-trace-detective",
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@11.25.0",
@@ -11,7 +11,8 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "data:refresh": "node scripts/fetch-catalog.mjs"
+    "data:blue-white:vam": "node scripts/build_vam_blue_white.mjs",
+    "data:blue-white:met": "python3 scripts/build_blue_white_corpus.py"
   },
   "dependencies": {
     "next": "latest",
