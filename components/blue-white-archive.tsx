@@ -22,21 +22,26 @@ type ArchiveProps = {
   stats: BlueWhiteStats;
 };
 
-const motifOptions = Object.entries({
-  "": "全部纹饰",
-  龙纹: "龙纹",
-  凤纹: "凤纹",
-  缠枝纹: "缠枝纹",
-  莲纹: "莲纹",
-  牡丹纹: "牡丹纹",
-  花卉纹: "花卉纹",
-  山水纹: "山水纹",
-  人物纹: "人物纹",
-  禽鸟纹: "禽鸟纹",
-  鱼藻纹: "鱼藻纹",
-  水波纹: "水波纹",
-  文字纹: "文字纹",
-});
+const preferredMotifs = [
+  "龙纹",
+  "凤纹",
+  "缠枝纹",
+  "莲纹",
+  "牡丹纹",
+  "花卉纹",
+  "山水纹",
+  "人物纹",
+  "人物故事纹",
+  "禽鸟纹",
+  "鱼藻纹",
+  "瑞果纹",
+  "水波纹",
+  "云纹",
+  "梅纹",
+  "菊纹",
+  "几何纹",
+  "文字纹",
+];
 
 const periodOptions = Object.entries({
   "": "全部年代",
@@ -60,6 +65,13 @@ export function BlueWhiteArchive({ stats }: ArchiveProps) {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
+  const motifOptions = [
+    ["", "全部纹饰"],
+    ...preferredMotifs.map((motif) => [motif, motif]),
+    ...Object.keys(stats.motifCounts)
+      .filter((motif) => !preferredMotifs.includes(motif))
+      .map((motif) => [motif, motif]),
+  ];
 
   useEffect(() => {
     const controller = new AbortController();
@@ -123,19 +135,19 @@ export function BlueWhiteArchive({ stats }: ArchiveProps) {
     <section className="archive-section" id="archive">
       <div className="archive-header">
         <div className="section-label">
-          <span>开放证据档案</span>
+          <span>故宫陶瓷馆藏档案</span>
           <i />
-          <span>维艾博物馆 + 大都会博物馆</span>
+          <span>故宫博物院数字文物库</span>
         </div>
         <div>
           <h2>
-            {stats.total.toLocaleString("zh-CN")} 件青花，
+            {stats.total.toLocaleString("zh-CN")} 件完整学名，
             <br />
-            <em>不是 1,172 个标签。</em>
+            <em>不是一个“瓶”字。</em>
           </h2>
           <p>
-            每条记录都保留馆藏来源、时代字段、工艺字段及自动提取关系的证据片段。
-            选择任意一件蓝白瓷，送入探案台继续追问。
+            每件器物都使用故宫博物院正式名称、馆藏编号、年代和公开图片。
+            选择任意一件完整学名馆藏，送入探案台继续追问。
           </p>
         </div>
       </div>
@@ -146,7 +158,7 @@ export function BlueWhiteArchive({ stats }: ArchiveProps) {
           <input
             type="search"
             value={query}
-            placeholder="搜索龙纹、莲纹、瓶、罐、朝代或馆藏编号"
+            placeholder="搜索完整学名、纹饰、器型、朝代或馆藏编号"
             onChange={(event) => {
               setQuery(event.target.value);
               resetPage();
