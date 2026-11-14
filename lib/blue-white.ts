@@ -5,6 +5,13 @@ import type {
   BlueWhiteStats,
   EvidenceRelation,
 } from "@/lib/detective-types";
+import {
+  zhCatalogLabel,
+  zhMedium,
+  zhMuseumShortName,
+  zhPeriod,
+  zhText,
+} from "@/lib/zh-localization";
 
 type VamRecord = {
   id: string;
@@ -58,25 +65,6 @@ type MetRecord = {
 const vamRecords = (vamData as { records: VamRecord[] }).records;
 const metRecords = (metData as { records: MetRecord[] }).records;
 
-const formAliases: Array<[RegExp, string]> = [
-  [/teabowl/i, "茶碗"],
-  [/coffee can|teacup|mug|tankard|stemcup/i, "杯"],
-  [/sauce|butter boat|boat/i, "酱汁船"],
-  [/tea ?caddy|canister/i, "茶叶罐"],
-  [/tray|patty pan/i, "托盘"],
-  [/salt|sugar|basin/i, "盛器"],
-  [/tureen/i, "盖碗"],
-  [/flask|bottle/i, "扁壶"],
-  [/vase/i, "瓶"],
-  [/dish|plate/i, "盘"],
-  [/bowl/i, "碗"],
-  [/jar/i, "罐"],
-  [/jug|ewer|pot/i, "壶"],
-  [/box/i, "盒"],
-  [/sprinkler/i, "洒水器"],
-  [/tile|tablet/i, "瓷板"],
-];
-
 const periodOrder = [
   "13世纪",
   "14世纪",
@@ -93,11 +81,37 @@ const periodOrder = [
 ];
 
 function normalizeForm(value: string) {
-  for (const [pattern, replacement] of formAliases) {
-    if (pattern.test(value)) return replacement;
-  }
   if (/[\u4e00-\u9fff]/.test(value)) return value;
-  return value || "器型未标注";
+  return value ? zhCatalogLabel(value) : "器型未标注";
+}
+
+function localizedRelations(
+  artifact: Omit<BlueWhiteArtifact, "relations">,
+  relations: EvidenceRelation[],
+) {
+  return relations.map((relation) => {
+    const evidenceByKind: Record<EvidenceRelation["kind"], string> = {
+      collection: `馆藏来源为${artifact.museum}，馆藏编号为 ${artifact.accessionNumber}。`,
+      technique: `馆藏材质与技法字段支持“青花瓷”工艺判断。`,
+      tradition: `馆藏名称、摘要或材质字段支持“${artifact.tradition}”的归属。`,
+      period: `馆藏制作年代字段记录为“${artifact.period}”。`,
+      motif: `馆藏名称、器名或摘要支持“${relation.object}”纹饰线索。`,
+      form: `馆藏名称或器名支持“${relation.object}”器型线索。`,
+    };
+
+    return {
+      ...relation,
+      object:
+        relation.kind === "technique"
+          ? "青花瓷"
+          : relation.kind === "period"
+            ? artifact.period
+            : relation.kind === "collection"
+              ? artifact.museum
+              : zhText(relation.object),
+      evidence: evidenceByKind[relation.kind],
+    };
+  });
 }
 
 function getPeriodBucket(period: string) {
@@ -130,56 +144,92 @@ function getPeriodBucket(period: string) {
 }
 
 function normalizeVam(record: VamRecord): BlueWhiteArtifact {
-  return {
+  const base = {
     id: record.id,
     sourceId: record.sourceId,
     museum: "维多利亚与艾尔伯特博物馆",
-    museumShortName: "V&A",
+    museumShortName: zhMuseumShortName("Victoria and Albert Museum"),
     accessionNumber: record.accessionNumber,
-    title: record.title,
-    objectName: record.objectName,
-    maker: record.maker || "制作者未标注",
-    productionPlace: record.productionPlace || "制作地未标注",
+    title: zhCatalogLabel(record.title || record.objectName),
+    sourceTitle: record.title,
+    objectName: zhCatalogLabel(record.objectName || record.title),
+    sourceObjectName: record.objectName,
+    maker: /unknown/i.test(record.maker) ? "制作者未标注" : zhText(record.maker),
+    productionPlace: record.productionPlace
+      ? zhText(record.productionPlace)
+      : "制作地未标注",
     tradition: record.tradition || "产地待考",
-    period: record.period,
+    period: zhPeriod(record.period, getPeriodBucket(record.period)),
+    sourcePeriod: record.period,
     periodBucket: getPeriodBucket(record.period),
     dateText: record.dateText,
-    medium: record.materialsAndTechniques,
+    medium: zhMedium(record.materialsAndTechniques),
+    sourceMedium: record.materialsAndTechniques,
     summary: record.summary,
     image: record.image,
     sourceUrl: record.sourceUrl,
-    sourceLabel: record.sourceLabel,
+    sourceLabel: "维多利亚与艾尔伯特博物馆 · 馆藏数据",
     motifs: record.motifs,
     forms: [...new Set(record.forms.map(normalizeForm))],
-    relations: record.relations,
-    analysis: record.analysis,
+    analysis: {
+      observation: record.analysis.observation,
+      technique: `馆藏材质与技法记录为“${zhMedium(
+        record.materialsAndTechniques,
+      )}”。`,
+      chronology: `馆藏制作年代记录为“${zhPeriod(
+        record.period,
+        getPeriodBucket(record.period),
+      )}”。`,
+      uncertainty: record.analysis.uncertainty,
+    },
+  };
+
+  return {
+    ...base,
+    relations: localizedRelations(base, record.relations),
   };
 }
 
 function normalizeMet(record: MetRecord): BlueWhiteArtifact {
-  return {
+  const base = {
     id: record.id,
     sourceId: record.objectId,
     museum: "大都会艺术博物馆",
-    museumShortName: "The Met",
+    museumShortName: zhMuseumShortName("The Met"),
     accessionNumber: record.objectId,
-    title: record.title,
-    objectName: record.objectName,
+    title: zhCatalogLabel(record.title || record.objectName),
+    sourceTitle: record.title,
+    objectName: zhCatalogLabel(record.objectName || record.title),
+    sourceObjectName: record.objectName,
     maker: "制作者未标注",
-    productionPlace: record.culture,
+    productionPlace: zhText(record.culture || "制作地未标注"),
     tradition: "中国青花",
-    period: record.period,
+    period: zhPeriod(record.period, getPeriodBucket(record.period)),
+    sourcePeriod: record.period,
     periodBucket: getPeriodBucket(record.period),
     dateText: record.dateText,
-    medium: record.medium,
+    medium: zhMedium(record.medium),
+    sourceMedium: record.medium,
     summary: "",
     image: "",
     sourceUrl: record.sourceUrl,
-    sourceLabel: record.sourceLabel,
+    sourceLabel: "大都会艺术博物馆 · 开放馆藏",
     motifs: record.motifs,
     forms: [...new Set(record.forms.map(normalizeForm))],
-    relations: record.relations,
-    analysis: record.analysis,
+    analysis: {
+      observation: record.analysis.observation,
+      technique: `馆藏材质与技法记录为“${zhMedium(record.medium)}”。`,
+      chronology: `馆藏制作年代记录为“${zhPeriod(
+        record.period,
+        getPeriodBucket(record.period),
+      )}”。`,
+      uncertainty: record.analysis.uncertainty,
+    },
+  };
+
+  return {
+    ...base,
+    relations: localizedRelations(base, record.relations),
   };
 }
 
@@ -265,7 +315,12 @@ export function searchBlueWhite(query: string, limit = 6) {
       for (const value of [
         artifact.title,
         artifact.objectName,
+        artifact.sourceTitle,
+        artifact.sourceObjectName,
         artifact.period,
+        artifact.sourcePeriod,
+        artifact.medium,
+        artifact.sourceMedium,
         artifact.tradition,
         artifact.maker,
         artifact.summary.slice(0, 800),
