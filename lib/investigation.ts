@@ -389,7 +389,7 @@ export function investigate(input: InvestigateInput): InvestigationReport {
     {
       name: "定位馆藏对象",
       status: "complete",
-      detail: `从 ${blueWhiteArtifacts.length} 条蓝白瓷记录中选择「${artifact.title}」。`,
+      detail: `从 ${blueWhiteArtifacts.length} 条完整学名馆藏中选择「${artifact.title}」。`,
       durationMs: Math.max(1, Math.round(elapsed * 0.2)),
     },
     {
