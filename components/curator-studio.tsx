@@ -1,15 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { FormEvent, useMemo, useState } from "react";
-import type { Artifact, CurateInput, CuratedExhibition } from "@/lib/types";
+import { useMemo, useState } from "react";
+import type { CSSProperties, FormEvent } from "react";
+import type { CurateInput, CuratedExhibition } from "@/lib/types";
 import { ArrowRight, ArrowUpRight, Play, Spark } from "@/components/icons";
-import { curateExhibition } from "@/lib/curator";
 
 type Perspective = "adult" | "child" | "accessible";
 
 type CuratorStudioProps = {
-  artifacts: Artifact[];
+  initialExhibition: CuratedExhibition;
 };
 
 const examplePrompts = [
@@ -35,12 +35,10 @@ function sleep(ms: number) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
-export function CuratorStudio({ artifacts }: CuratorStudioProps) {
+export function CuratorStudio({ initialExhibition }: CuratorStudioProps) {
   const [input, setInput] = useState<CurateInput>(defaultInput);
-  const [result, setResult] = useState<CuratedExhibition>(() =>
-    curateExhibition(defaultInput),
-  );
-  const [activeId, setActiveId] = useState(result.artifactIds[0]);
+  const [result, setResult] = useState<CuratedExhibition>(initialExhibition);
+  const [activeId, setActiveId] = useState(initialExhibition.artifactIds[0]);
   const [perspective, setPerspective] = useState<Perspective>("adult");
   const [working, setWorking] = useState(false);
   const [activeAgent, setActiveAgent] = useState(4);
@@ -48,11 +46,8 @@ export function CuratorStudio({ artifacts }: CuratorStudioProps) {
   const [speaking, setSpeaking] = useState(false);
 
   const selectedArtifacts = useMemo(
-    () =>
-      result.artifactIds
-        .map((id) => artifacts.find((artifact) => artifact.id === id))
-        .filter((artifact): artifact is Artifact => Boolean(artifact)),
-    [artifacts, result.artifactIds],
+    () => result.artifacts,
+    [result.artifacts],
   );
 
   const activeArtifact =
@@ -71,7 +66,11 @@ export function CuratorStudio({ artifacts }: CuratorStudioProps) {
       const request = fetch("/api/curate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
+        body: JSON.stringify({
+          ...input,
+          seed: Date.now() + Math.floor(Math.random() * 10000),
+          excludeIds: result.artifacts.map((artifact) => artifact.id),
+        }),
       });
 
       for (let step = 0; step < 4; step += 1) {
@@ -285,14 +284,25 @@ export function CuratorStudio({ artifacts }: CuratorStudioProps) {
             {activeArtifact ? (
               <article className="artifact-stage">
                 <div className="artifact-visual">
-                  <Image
-                    src={activeArtifact.image}
-                    alt={`${activeArtifact.title}，${activeArtifact.period}，${activeArtifact.medium}`}
-                    fill
-                    sizes="(max-width: 900px) 100vw, 48vw"
-                    style={{ objectPosition: activeArtifact.imagePosition ?? "center" }}
-                    priority={activeArtifact.id === "jue"}
-                  />
+                  {activeArtifact.image ? (
+                    <Image
+                      src={activeArtifact.image}
+                      alt={`${activeArtifact.title}，${activeArtifact.period}，${activeArtifact.medium}`}
+                      fill
+                      sizes="(max-width: 900px) 100vw, 48vw"
+                      style={{ objectPosition: activeArtifact.imagePosition ?? "center" }}
+                      priority={activeArtifact.id === "jue"}
+                    />
+                  ) : (
+                    <div
+                      className="artifact-image-fallback"
+                      style={{ "--artifact-accent": activeArtifact.accent } as CSSProperties}
+                    >
+                      <span>{activeArtifact.category ?? "馆藏"}</span>
+                      <strong>{activeArtifact.title.slice(0, 1)}</strong>
+                      <small>暂无开放图像 · 以馆藏记录展示</small>
+                    </div>
+                  )}
                   <span className="visual-index">{activeArtifact.code}</span>
                   <div className="artifact-caption">
                     <h4>{activeArtifact.title}</h4>
@@ -302,6 +312,8 @@ export function CuratorStudio({ artifacts }: CuratorStudioProps) {
 
                 <div className="artifact-content">
                   <div className="artifact-meta">
+                    {activeArtifact.museum ? <span>{activeArtifact.museum}</span> : null}
+                    {activeArtifact.category ? <span>{activeArtifact.category}</span> : null}
                     <span>{activeArtifact.period}</span>
                     <span>{activeArtifact.date}</span>
                     <span>{activeArtifact.medium}</span>
@@ -362,8 +374,9 @@ export function CuratorStudio({ artifacts }: CuratorStudioProps) {
                 <div className="source-note">
                   <span>来源说明</span>
                   <p>
-                    馆藏信息来自 The Metropolitan Museum of Art 开放收藏记录；
-                    展览中的解释性文字已单独标示。
+                    馆藏关联信息来自{" "}
+                    {activeArtifact.sources[0]?.publisher ?? activeArtifact.museum}
+                    的开放记录；图像授权状态以原始来源页为准，解释性文字已单独标示。
                   </p>
                 </div>
               </aside>
