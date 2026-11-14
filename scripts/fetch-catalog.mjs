@@ -136,14 +136,14 @@ function inferCategory(title, types, materials, fallback = "") {
   const haystack = `${title} ${types} ${materials}`.toLowerCase();
 
   if (
-    /(硬幣|硬币|貨幣|货币|铜币|銅幣|coin|通宝|通寶|银钱|銀錢|金币|金幣|铜钱|銅錢|钱币|錢幣)/i.test(
+    /(硬幣|硬币|貨幣|货币|铜币|銅幣|coin|通宝|通寶|银钱|銀錢|金币|金幣|铜钱|銅錢|钱币|錢幣|银铤|銀鋌|银饼|銀餅|florin|denarius|aureus|drachm|stater|shilling|penny)/i.test(
       haystack,
     )
   ) {
     return "古钱币";
   }
   if (
-    /(瓷器|青花|粉彩|珐琅|琺瑯|陶瓷|陶器|陶俑|porcelain|ceramic|stoneware|釉|窑|窯)/i.test(
+    /(瓷器|青花|粉彩|珐琅|琺瑯|三彩|陶瓷|陶器|陶俑|porcelain|ceramic|stoneware|釉|窑|窯)/i.test(
       haystack,
     )
   ) {
@@ -392,7 +392,7 @@ async function main() {
       .map((record) => {
         const category = inferCategory(
           record.title,
-          record.type,
+          "",
           record.material,
           record.category,
         );
@@ -401,9 +401,23 @@ async function main() {
           : record.period === "年代待考"
             ? formatPeriod("", record.title, category)
             : record.period;
+        const type = [
+          "字画",
+          "其他文物",
+          "雕塑造像",
+          "古钱币",
+          "兵器",
+          "青铜器",
+          "陶瓷",
+          "玉器",
+          "织绣服饰",
+        ].includes(record.type)
+          ? category
+          : record.type;
         return {
           ...record,
           category,
+          type,
           period,
           accent: categoryAccent(category),
         };
