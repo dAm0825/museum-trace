@@ -50,9 +50,10 @@ export default function Home() {
             EXPLAINABLE GRAPH-RAG
           </div>
           <h1>
-            不是“这是什么”，
-            <br />
-            而是<em>“它为何如此？”</em>
+            <span className="hero-line">不是“这是什么”，</span>
+            <span className="hero-line">
+              而是<em>“它为何如此？”</em>
+            </span>
           </h1>
           <p>
             青花侦探把一件瓷器拆成纹饰、器型、年代与工艺关系。
