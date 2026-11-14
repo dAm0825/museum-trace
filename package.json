@@ -12,7 +12,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "data:blue-white:vam": "node scripts/build_vam_blue_white.mjs",
-    "data:blue-white:met": "python3 scripts/build_blue_white_corpus.py"
+    "data:blue-white:met": "python3 scripts/build_blue_white_corpus.py",
+    "data:zh-labels": "node scripts/build-zh-catalog-labels.mjs"
   },
   "dependencies": {
     "next": "latest",
