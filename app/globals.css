@@ -495,6 +495,8 @@ svg {
   font-family: var(--display);
   font-size: 20px;
   font-weight: 500;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .hero-case-footer small {
@@ -1190,12 +1192,11 @@ svg {
 }
 
 .chain-node strong {
-  overflow: hidden;
   font-family: var(--display);
   font-size: 15px;
   font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .chain-node small {
@@ -1651,10 +1652,9 @@ svg {
 
 .alternative-cases strong {
   display: block;
-  overflow: hidden;
   font-size: 8px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .alternative-cases small {
@@ -1927,14 +1927,12 @@ svg {
 }
 
 .archive-copy h3 {
-  overflow: hidden;
   margin: 7px 0 8px;
   font-family: var(--display);
-  font-size: 19px;
+  font-size: 17px;
   font-weight: 500;
   line-height: 1.4;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .archive-tags {
