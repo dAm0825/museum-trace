@@ -197,9 +197,9 @@ export function DetectiveStudio({
     <section className="detective-shell" id="investigator">
       <div className="detective-intro">
         <div className="section-label">
-          <span>CASE WORKBENCH</span>
+          <span>探案工作台</span>
           <i />
-          <span>{stats.total.toLocaleString("zh-CN")} RECORDS</span>
+          <span>{stats.total.toLocaleString("zh-CN")} 条馆藏</span>
         </div>
         <div className="detective-intro-grid">
           <h2>
@@ -296,7 +296,7 @@ export function DetectiveStudio({
       <div className={`case-workbench ${working ? "is-searching" : ""}`}>
         <div className="case-heading">
           <div>
-            <span className="case-index">CASE / {artifact.sourceId}</span>
+            <span className="case-index">案卷 / {artifact.sourceId}</span>
             <h3>{artifact.title}</h3>
             <p>
               {artifact.museumShortName} · {artifact.tradition} · {artifact.period}
@@ -322,14 +322,14 @@ export function DetectiveStudio({
                 />
               ) : (
                 <div className="no-image-artifact">
-                  <span>MET OPEN RECORD</span>
+                  <span>大都会开放馆藏</span>
                   <strong>{artifact.title.slice(0, 1)}</strong>
                   <small>该开放记录暂未提供图片</small>
                 </div>
               )}
-              <div className="image-coordinate top-left">A1</div>
-              <div className="image-coordinate bottom-right">B4</div>
-              <span className="image-credit">SOURCE IMAGE</span>
+              <div className="image-coordinate top-left">甲一</div>
+              <div className="image-coordinate bottom-right">乙四</div>
+              <span className="image-credit">馆藏原图</span>
             </div>
             <div className="case-artifact-info">
               <div className="artifact-tags">
@@ -376,8 +376,10 @@ export function DetectiveStudio({
 
           <section className="question-chain" aria-label="问题链画布">
             <header>
-              <span>QUESTION CHAIN</span>
-              <small>{report.nodes.length} NODES / {report.edges.length} EDGES</small>
+              <span>问题链</span>
+              <small>
+                {report.nodes.length} 个节点 / {report.edges.length} 条关系
+              </small>
             </header>
             <div className="chain-nodes">
               {report.nodes.map((node, index) => (
@@ -409,7 +411,7 @@ export function DetectiveStudio({
 
           <aside className="evidence-drawer">
             <header>
-              <span>EVIDENCE FOR THIS NODE</span>
+              <span>当前节点证据</span>
               <h4>{selectedNode?.label}</h4>
             </header>
             <p className="node-detail">{selectedNode?.detail}</p>
@@ -460,9 +462,9 @@ export function DetectiveStudio({
 
         <div className="agent-console">
           <header>
-            <span>AGENT TRACE / 真实执行记录</span>
+            <span>探究执行记录</span>
             <small>
-              {report.mode === "llm-assisted" ? "LLM 综合已启用" : "本地证据推理"}
+              {report.mode === "llm-assisted" ? "AI 证据综合已启用" : "本地证据推理"}
             </small>
           </header>
           <div className="trace-grid">
@@ -474,7 +476,7 @@ export function DetectiveStudio({
                 <span>{String(index + 1).padStart(2, "0")}</span>
                 <strong>{step.name}</strong>
                 <p>{step.detail}</p>
-                <small>{step.durationMs} ms</small>
+                <small>{step.durationMs} 毫秒</small>
               </article>
             ))}
           </div>
@@ -483,7 +485,7 @@ export function DetectiveStudio({
         <div className="case-bottom-grid">
           <section className="conflict-panel">
             <header>
-              <span>OPEN QUESTIONS</span>
+              <span>待解释问题</span>
               <h4>没有强行统一的证据</h4>
             </header>
             {report.conflicts.length ? (
@@ -507,7 +509,7 @@ export function DetectiveStudio({
 
           <section className="next-questions">
             <header>
-              <span>NEXT QUESTIONS</span>
+              <span>后续追问</span>
               <h4>沿着证据继续追问</h4>
             </header>
             {report.nextQuestions.map((nextQuestion, index) => (
