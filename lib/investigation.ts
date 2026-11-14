@@ -75,13 +75,22 @@ function chooseArtifact(input: InvestigateInput) {
   }
 
   const modelMotifs = input.visualObservation?.modelMotifs ?? [];
-  const searched = searchBlueWhite(input.question, 12)
+  const modelForms = input.visualObservation?.modelForms ?? [];
+  const hasVisualCandidates = modelMotifs.length > 0 || modelForms.length > 0;
+  const searched = (hasVisualCandidates
+    ? blueWhiteArtifacts.map((artifact) => ({
+        artifact,
+        score: artifact.image ? 1 : 0,
+      }))
+    : searchBlueWhite(input.question, 12)
+  )
     .map(({ artifact, score }) => ({
       artifact,
       score:
         score +
         modelMotifs.filter((motif) => artifact.motifs.includes(motif)).length *
-          18,
+          15 +
+        modelForms.filter((form) => artifact.forms.includes(form)).length * 22,
     }))
     .sort((a, b) => b.score - a.score);
 
