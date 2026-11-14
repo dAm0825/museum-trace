@@ -170,6 +170,7 @@ export function CatalogExplorer({
                   alt={item.title}
                   fill
                   sizes="(max-width: 700px) 100vw, 30vw"
+                  unoptimized
                 />
               ) : (
                 <div
