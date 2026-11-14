@@ -1,4 +1,4 @@
-import catalogData from "@/data/catalog.json";
+import catalogData from "@/data/catalog-fixed.json";
 import type { Artifact, EvidenceKind } from "@/lib/types";
 
 type CatalogRecord = {
